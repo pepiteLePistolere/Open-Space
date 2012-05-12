@@ -38,4 +38,24 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <EditText
+        android:id="@+id/CompleteName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="textPersonName" android:selectAllOnFocus="true" android:text="Complete Name" android:contentDescription="Testing"/>
+
+    <EditText
+        android:id="@+id/PhoneNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="phone" android:selectAllOnFocus="true" android:text="111-123-1234"/>
+
+    <Button
+        android:id="@+id/AddContact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add My Contact" />
+
 </LinearLayout>

@@ -1,12 +1,25 @@
 package org.home.fenrriquez.android;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.OperationApplicationException;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.provider.Contacts.People;
+import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Contacts;
+import android.provider.ContactsContract.Contacts.Data;
+import android.provider.ContactsContract.RawContacts;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -20,6 +33,7 @@ public class TestActivity extends Activity {
 	Button myBtn;
 	EditText myTxt;
 	Button Ct;
+	Button addC;
     final int PICK_CONTACT = 1;
     
     @Override
@@ -43,6 +57,50 @@ public class TestActivity extends Activity {
         		
         	}
         });
+        
+        addC = (Button)findViewById( R.id.AddContact);
+        addC.setOnClickListener( new OnClickListener() {
+        	public void onClick(View v) {
+        		addGhostContact( v );
+			}
+		});
+    }
+    
+    public void addGhostContact( View v){
+    	
+    	EditText tmp = (EditText)findViewById( R.id.CompleteName);
+    	String name = tmp.getText().toString();
+    	tmp = (EditText)findViewById( R.id.PhoneNumber);
+    	String phone = tmp.getText().toString();
+    	
+    	ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+    	int rawContactInsertIndex = 0;
+
+    	ops.add(ContentProviderOperation.newInsert(RawContacts.CONTENT_URI)
+    	   .withValue(RawContacts.ACCOUNT_TYPE, null)
+    	   .withValue(RawContacts.ACCOUNT_NAME,null )
+    	   .build());
+    	ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+    	   .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactInsertIndex)
+    	   .withValue(Data.MIMETYPE,Phone.CONTENT_ITEM_TYPE)
+    	   .withValue(Phone.NUMBER, phone)
+    	   .build());
+    	ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+    	   .withValueBackReference(Data.RAW_CONTACT_ID, rawContactInsertIndex)
+    	   .withValue(Data.MIMETYPE,StructuredName.CONTENT_ITEM_TYPE)
+    	   .withValue(StructuredName.DISPLAY_NAME, name)
+    	   .build());  
+    	try {
+			ContentProviderResult[] res = getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (OperationApplicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    	Toast.makeText( v.getContext() , "Contact "+ name +" Added with Phone: "+phone, Toast.LENGTH_LONG).show();
     }
     
     @Override
